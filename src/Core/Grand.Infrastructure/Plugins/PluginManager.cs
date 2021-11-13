@@ -238,6 +238,21 @@ namespace Grand.Infrastructure.Plugins
 
         private static PluginInfo PreparePluginInfo(FileInfo pluginFile)
         {
+            
+            if (pluginFile.Name.Contains("libzstd"))
+            {
+                return null;
+            }
+
+            if (pluginFile.Name.Contains("snappy32"))
+            {
+                return null;
+            }
+            if (pluginFile.Name.Contains("snappy64"))
+            {
+                return null;
+            }
+
             var _plug = _config.PluginShadowCopy ? ShadowCopyFile(pluginFile, Directory.CreateDirectory(_copyFolder.FullName)) : pluginFile;
 
             Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(_plug.FullName);

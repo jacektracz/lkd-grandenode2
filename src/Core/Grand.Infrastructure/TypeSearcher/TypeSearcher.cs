@@ -117,7 +117,8 @@ namespace Grand.Infrastructure.TypeSearchers
             var addedAssemblyNames = new List<string>();
             var assemblies = new List<Assembly>();
             var currentAssem = Assembly.GetExecutingAssembly();
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in asms)
             {
                 var product = assembly.GetCustomAttribute<AssemblyProductAttribute>();
                 var referencedAssemblies = assembly.GetReferencedAssemblies().ToList();

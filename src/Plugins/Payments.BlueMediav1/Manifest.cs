@@ -1,12 +1,12 @@
 ﻿using Grand.Infrastructure;
 using Grand.Infrastructure.Plugins;
-using Payments.PayPalStandard;
+using Payments.BlueMediaV1;
 
 [assembly: PluginInfo(
-    FriendlyName = "PayPal Standard v1",
+    FriendlyName = "Blue Media Standard",
     Group = "Payment methods",
-    SystemName = PayPalStandardPaymentDefaults.ProviderSystemName,
+    SystemName = BlueMediaV1PaymentDefaults.ProviderSystemName,
     SupportedVersion = GrandVersion.SupportedPluginVersion,
-    Author = "grandnode team",
+    Author = "lakida team",
     Version = "1.00"
 )]
