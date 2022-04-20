@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Language Name="English">
+   <Resource Name="plugins.payments.przelewy24v1.fields.additionalfee">
+      <Value>Opłaty dodatkowe</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.additionalfee.hint">
+      <Value>Podaj opłaty dodatkowe obciążające twojego klienta.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.additionalfeepercentage">
+      <Value>Opłaty dodatkowe. Określ w procentach</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.additionalfeepercentage.hint">
+      <Value>Określa, czy należy zastosować opłatę dodatkową jako procentową wartość sumy zamówienia. Jeśli nie jest włączone, jest używana wartość stała.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.addressoverride">
+      <Value>Adres przesłaniania</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.addressoverride.hint">
+      <Value>Dla ludzi, którzy już mają konta PayPal, a którzy są moniowanit o adres wysyłki, zanim zdecydują się na płatność w systemie PayPal, mogą skorzystać z wprowadzonego adresu zamiast adresu przechowywanego w systemie PayPal.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.businessemail">
+      <Value>E-mail firmowy</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.businessemail.hint">
+      <Value>Podaj swój firmowy adres e-mail PayPal.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.displayorder">
+      <Value>Display order</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.enableipn">
+      <Value>Włącz IPN (Instant Payment Notification)</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.enableipn.hint">
+      <Value>Sprawdź czy IPN jest włączony.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.enableipn.hint2">
+      <Value>Pozostaw puste aby użyć domyślnej obsługi URL dla IPN.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.ipnurl">
+      <Value>Obsługa IPN (IPN Handler)</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.ipnurl.hint">
+      <Value>Określ obsługę IPN (Handler).</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.passproductnamesandtotals">
+      <Value>Prześlij nazwy produktów i podliczenie zamówienia do PayPal</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.passproductnamesandtotals.hint">
+      <Value>Zaznacz jeśli nazwy produktów i podliczenie zamówienia ma zostać przesłane do PayPal.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.pdttoken">
+      <Value>Token identyfikacyjny PDT</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.pdttoken.hint">
+      <Value>Podaj token identyfikacyjny PDT</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.pdtvalidateordertotal">
+      <Value>PDT. Weryfikacja całości zamówienia</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.pdtvalidateordertotal.hint">
+      <Value>Zaznacz jeśli PDT ma obsługiwać weryfikację całości zamówienia.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.redirectiontip">
+      <Value>Nastąpi przekierowanie do strony PayPal w celu zakończenia zamówienia.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.returnfrompaypalwithoutpaymentredirectstoorderdetailspage">
+      <Value>Powrót do strony szczegółów zamówienia</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.returnfrompaypalwithoutpaymentredirectstoorderdetailspage.hint">
+      <Value>Włącz, jeśli klient powinien zostać przekierowany do strony szczegółów zamówienia, gdy kliknie link "powrót do przechowywania" na stronie PayPal bez zakończenia płatności</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.usesandbox">
+      <Value>Użyj Sandbox</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.fields.usesandbox.hint">
+      <Value>Zaznacz aby włączyć Sandbox (środowisko testowe).</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.instructions">
+      <Value>&lt;p&gt;&lt;b&gt;If you're using this gateway ensure that your primary store currency is supported by PayPal.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;To use PDT, you must activate PDT and Auto Return in your PayPal account profile. You must also acquire a PDT identity token, which is used in all PDT communication you send to PayPal. Follow these steps to configure your account for PDT:&lt;br /&gt;&lt;br /&gt;1. Log in to your PayPal account (click &lt;a href="https://www.paypal.com/us/webapps/mpp/referral/paypal-business-account2?partner_id=9JJPJNNPQ7PZ8" target="_blank"&gt;here&lt;/a&gt; to create your account).&lt;br /&gt;2. Click the Profile subtab.&lt;br /&gt;3. Click Website Payment Preferences in the Seller Preferences column.&lt;br /&gt;4. Under Auto Return for Website Payments, click the On radio button.&lt;br /&gt;5. For the Return URL, enter the URL on your site that will receive the transaction ID posted by PayPal after a customer payment ({0}).&lt;br /&gt;6. Under Payment Data Transfer, click the On radio button.&lt;br /&gt;7. Click Save.&lt;br /&gt;8. Click Website Payment Preferences in the Seller Preferences column.&lt;br /&gt;9. Scroll down to the Payment Data Transfer section of the page to view your PDT identity token.&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.paymentmethoddescription">
+      <Value>PayPal</Value>
+   </Resource>
+   <Resource Name="plugins.payments.przelewy24v1.roundingwarning">
+      <Value>It looks like you have "ShoppingCartSettings.RoundPricesDuringCalculation" setting disabled. Keep in mind that this can lead to a discrepancy of the order total amount, as PayPal only rounds to two doubles.</Value>
+   </Resource>
+
+   <Resource Name="plugins.payments.bluemediav1.fields.additionalfee">
+      <Value>Opłaty dodatkowe</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.additionalfee.hint">
+      <Value>Podaj opłaty dodatkowe obciążające twojego klienta.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.additionalfeepercentage">
+      <Value>Opłaty dodatkowe. Określ w procentach</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.additionalfeepercentage.hint">
+      <Value>Określa, czy należy zastosować opłatę dodatkową jako procentową wartość sumy zamówienia. Jeśli nie jest włączone, jest używana wartość stała.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.addressoverride">
+      <Value>Adres przesłaniania</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.addressoverride.hint">
+      <Value>Dla ludzi, którzy już mają konta PayPal, a którzy są moniowanit o adres wysyłki, zanim zdecydują się na płatność w systemie PayPal, mogą skorzystać z wprowadzonego adresu zamiast adresu przechowywanego w systemie PayPal.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.businessemail">
+      <Value>E-mail firmowy</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.businessemail.hint">
+      <Value>Podaj swój firmowy adres e-mail PayPal.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.displayorder">
+      <Value>Display order</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.enableipn">
+      <Value>Włącz IPN (Instant Payment Notification)</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.enableipn.hint">
+      <Value>Sprawdź czy IPN jest włączony.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.enableipn.hint2">
+      <Value>Pozostaw puste aby użyć domyślnej obsługi URL dla IPN.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.ipnurl">
+      <Value>Obsługa IPN (IPN Handler)</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.ipnurl.hint">
+      <Value>Określ obsługę IPN (Handler).</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.passproductnamesandtotals">
+      <Value>Prześlij nazwy produktów i podliczenie zamówienia do PayPal</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.passproductnamesandtotals.hint">
+      <Value>Zaznacz jeśli nazwy produktów i podliczenie zamówienia ma zostać przesłane do PayPal.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.pdttoken">
+      <Value>Token identyfikacyjny PDT</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.pdttoken.hint">
+      <Value>Podaj token identyfikacyjny PDT</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.pdtvalidateordertotal">
+      <Value>PDT. Weryfikacja całości zamówienia</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.pdtvalidateordertotal.hint">
+      <Value>Zaznacz jeśli PDT ma obsługiwać weryfikację całości zamówienia.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.redirectiontip">
+      <Value>Nastąpi przekierowanie do strony PayPal w celu zakończenia zamówienia.</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.returnfrompaypalwithoutpaymentredirectstoorderdetailspage">
+      <Value>Powrót do strony szczegółów zamówienia</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.returnfrompaypalwithoutpaymentredirectstoorderdetailspage.hint">
+      <Value>Włącz, jeśli klient powinien zostać przekierowany do strony szczegółów zamówienia, gdy kliknie link "powrót do przechowywania" na stronie PayPal bez zakończenia płatności</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.usesandbox">
+      <Value>Użyj Sandbox</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.fields.usesandbox.hint">
+      <Value>Zaznacz aby włączyć Sandbox (środowisko testowe).</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.instructions">
+      <Value>&lt;p&gt;&lt;b&gt;If you're using this gateway ensure that your primary store currency is supported by PayPal.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;To use PDT, you must activate PDT and Auto Return in your PayPal account profile. You must also acquire a PDT identity token, which is used in all PDT communication you send to PayPal. Follow these steps to configure your account for PDT:&lt;br /&gt;&lt;br /&gt;1. Log in to your PayPal account (click &lt;a href="https://www.paypal.com/us/webapps/mpp/referral/paypal-business-account2?partner_id=9JJPJNNPQ7PZ8" target="_blank"&gt;here&lt;/a&gt; to create your account).&lt;br /&gt;2. Click the Profile subtab.&lt;br /&gt;3. Click Website Payment Preferences in the Seller Preferences column.&lt;br /&gt;4. Under Auto Return for Website Payments, click the On radio button.&lt;br /&gt;5. For the Return URL, enter the URL on your site that will receive the transaction ID posted by PayPal after a customer payment ({0}).&lt;br /&gt;6. Under Payment Data Transfer, click the On radio button.&lt;br /&gt;7. Click Save.&lt;br /&gt;8. Click Website Payment Preferences in the Seller Preferences column.&lt;br /&gt;9. Scroll down to the Payment Data Transfer section of the page to view your PDT identity token.&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.paymentmethoddescription">
+      <Value>PayPal</Value>
+   </Resource>
+   <Resource Name="plugins.payments.bluemediav1.roundingwarning">
+      <Value>It looks like you have "ShoppingCartSettings.RoundPricesDuringCalculation" setting disabled. Keep in mind that this can lead to a discrepancy of the order total amount, as PayPal only rounds to two doubles.</Value>
+   </Resource>
+
+</Language>

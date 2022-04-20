@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Language Name="English">
+   <Resource Name="payments.przelewy24v1.friendlyname">
+      <Value>Przelewy24</Value>
+   </Resource>
+   <Resource Name="payments.bluemediav1.friendlyname">
+      <Value>Blue Media</Value>
+   </Resource>
+</Language>
