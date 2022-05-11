@@ -166,7 +166,7 @@ public class PersistableProductPopulator extends
     			target.setProductWeight(source.getProductSpecifications().getWeight());
     			target.setProductWidth(source.getProductSpecifications().getWidth());
 
-
+    			String manufacturer = source.getProductSpecifications().getManufacturer();
     	         if(source.getProductSpecifications().getManufacturer()!=null) {
 
                    Manufacturer manuf = null;
