@@ -321,10 +321,10 @@ public class PersistableProductPopulator extends
 			if(source.getAttributes()!=null) {
 				for(com.salesmanager.shop.model.catalog.product.attribute.PersistableProductAttribute attr : source.getAttributes()) {
 					ProductAttribute attribute = persistableProductAttributeMapper.convert(attr, store, language);
-
-					attribute.setProduct(target);
-					target.getAttributes().add(attribute);
-
+					if(attribute!= null) {
+						attribute.setProduct(target);
+						target.getAttributes().add(attribute);
+					}
 				}
 			}
 

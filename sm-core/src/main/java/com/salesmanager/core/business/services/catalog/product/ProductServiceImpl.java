@@ -265,79 +265,120 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 	}
 
 	private void saveOrUpdate(Product product) throws ServiceException {
+		
 		LOGGER.debug("Save or update product ");
 		Validate.notNull(product, "product cannot be null");
 		Validate.notNull(product.getAvailabilities(), "product must have at least one availability");
 		Validate.notEmpty(product.getAvailabilities(), "product must have at least one availability");
-
-		// take care of product images separately
+		
 		Set<ProductImage> originalProductImages = new HashSet<ProductImage>(product.getImages());
-
-		/** save product first **/
-
+		
 		if (product.getId() != null && product.getId() > 0) {
 			super.update(product);
 		} else {
 			super.create(product);
 		}
 
-		/**
-		 * Image creation needs extra service to save the file in the CMS
-		 */
-		List<Long> newImageIds = new ArrayList<Long>();
-		Set<ProductImage> images = product.getImages();
+		/** save product first **/
+		handleSaveImages(product, originalProductImages);		
+		
+	}
+	
+	private void handleSaveImages(Product product,Set<ProductImage> originalProductImages) {
 
 		try {
+			
+			LOGGER.debug("handleSaveImages-start " );
+			List<Long> newImageIds = new ArrayList<Long>();
+			Set<ProductImage> images = product.getImages();
 
 			if (images != null && images.size() > 0) {
+				LOGGER.debug("handleSaveImages-saveOneImages-start " );
 				for (ProductImage image : images) {
-					if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
-						image.setProduct(product);
-
-						InputStream inputStream = image.getImage();
-						ImageContentFile cmsContentImage = new ImageContentFile();
-						cmsContentImage.setFileName(image.getProductImage());
-						cmsContentImage.setFile(inputStream);
-						cmsContentImage.setFileContentType(FileContentType.PRODUCT);
-
-						productImageService.addProductImage(product, image, cmsContentImage);
-						newImageIds.add(image.getId());
-					} else {
-						if (image.getId() != null) {
-							productImageService.save(image);
-							newImageIds.add(image.getId());
-						}
-					}
+					LOGGER.debug("handleSaveImages-saveOneImage-start " );
+					saveOneImage(image,product,newImageIds);
+					LOGGER.debug("handleSaveImages-saveOneImage-end " );
 				}
+				LOGGER.debug("handleSaveImages-saveOneImages-end " );
 			}
 
 			// cleanup old and new images
 			if (originalProductImages != null) {
+				LOGGER.debug("handleSaveImages-cleanupOneImages-start " );
 				for (ProductImage image : originalProductImages) {
-
-					if (image.getImage() != null && image.getId() == null) {
-						image.setProduct(product);
-
-						InputStream inputStream = image.getImage();
-						ImageContentFile cmsContentImage = new ImageContentFile();
-						cmsContentImage.setFileName(image.getProductImage());
-						cmsContentImage.setFile(inputStream);
-						cmsContentImage.setFileContentType(FileContentType.PRODUCT);
-
-						productImageService.addProductImage(product, image, cmsContentImage);
-						newImageIds.add(image.getId());
-					} else {
-						if (!newImageIds.contains(image.getId())) {
-							productImageService.delete(image);
-						}
-					}
+					LOGGER.debug("handleSaveImages-cleanupOneImage-start " );
+					cleanupOneImage(image,product,newImageIds);
+					LOGGER.debug("handleSaveImages-cleanupOneImage-end " );
 				}
+				LOGGER.debug("handleSaveImages-cleanupOneImages-end " );
 			}
-
+			LOGGER.debug("handleSaveImages-end " );
 		} catch (Exception e) {
 			LOGGER.error("Cannot save images " + e.getMessage());
-		}
+		}		
+	}	
+	
+	private void cleanupOneImage(ProductImage image,Product product,List<Long> newImageIds) {
+		if (image.getImage() != null && image.getId() == null) {
+			try {
+				LOGGER.debug("cleanup-add-image-start " );
+				image.setProduct(product);
+				InputStream inputStream = image.getImage();
+				ImageContentFile cmsContentImage = new ImageContentFile();
+				cmsContentImage.setFileName(image.getProductImage());
+				cmsContentImage.setFile(inputStream);
+				cmsContentImage.setFileContentType(FileContentType.PRODUCT);
 
+				productImageService.addProductImage(product, image, cmsContentImage);
+				newImageIds.add(image.getId());
+				LOGGER.debug("cleanup-add-image-end " );
+			} catch (Exception e) {
+				LOGGER.error("Cannot save images-2 " + e.getMessage());
+			}						
+		} else {
+			try {
+				LOGGER.debug("delete-image-start " );
+				if (!newImageIds.contains(image.getId())) {
+					productImageService.delete(image);
+				}
+				LOGGER.debug("delete-image-end " );
+			} catch (Exception e) {
+				LOGGER.error("Cannot save images-3 " + e.getMessage());
+			}
+		}
+	}
+	
+	private void saveOneImage(ProductImage image,Product product,List<Long> newImageIds) {
+		if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
+			try {
+				LOGGER.debug("saveOneImage-addProductImage-start " );
+				image.setProduct(product);
+
+				InputStream inputStream = image.getImage();
+				ImageContentFile cmsContentImage = new ImageContentFile();
+				cmsContentImage.setFileName(image.getProductImage());
+				cmsContentImage.setFile(inputStream);
+				cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+
+				productImageService.addProductImage(product, image, cmsContentImage);
+				newImageIds.add(image.getId());
+				LOGGER.debug("saveOneImage-addProductImage-end " );
+			} catch (Exception e) {
+				LOGGER.error("Cannot save images-1 " + e.getMessage());
+			}							
+		} else {
+			try {
+				LOGGER.debug("saveOneImage-save-start " );
+				if (image.getId() != null) {
+					productImageService.save(image);
+					newImageIds.add(image.getId());
+				}
+				LOGGER.debug("saveOneImage-save-end " );
+			} catch (Exception e) {
+				LOGGER.error("Cannot save images-1 " + e.getMessage());
+			}	
+		}
+		
 	}
 
 	@Override

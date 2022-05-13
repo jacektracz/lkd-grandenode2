@@ -20,13 +20,24 @@ public abstract class CacheManagerImpl implements CacheManager {
   @SuppressWarnings("rawtypes")
   private TreeCache treeCache = null;
 
+  private String getDbgClassName() {
+	  return "CacheManagerImpl::";
+  }
+  
+  private void loggerDebug(String tt) {
+	  String ttx = getDbgClassName() + tt;
+	  LOGGER.debug(ttx);
+  }
   @SuppressWarnings("unchecked")
   protected void init(String namedCache, String locationFolder) {
 
 
     try {
 
-      this.location = locationFolder;
+      this.location = locationFolder + "";
+      
+      loggerDebug("CACHE-LOCATION-FOLDER:" + locationFolder);
+      
       // manager = new DefaultCacheManager(repositoryFileName);
 
       VendorCacheManager manager = VendorCacheManager.getInstance();
@@ -52,7 +63,7 @@ public abstract class CacheManagerImpl implements CacheManager {
       
       Configuration config = new ConfigurationBuilder()
     		   .persistence().passivation(false)
-    		   .addSingleFileStore()
+    		   .addSingleFileStore()    		   
     		   .segmented(false)
     		   .location(location).async().enable()
     		   .preload(false).shared(false)
@@ -67,7 +78,7 @@ public abstract class CacheManagerImpl implements CacheManager {
       treeCache = f.createTreeCache(cache);
       cache.start();
 
-      LOGGER.debug("CMS started");
+      loggerDebug("CMS started");
 
 
 

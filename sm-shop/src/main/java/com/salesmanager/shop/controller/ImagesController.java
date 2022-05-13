@@ -185,14 +185,15 @@ public class ImagesController {
 		
 		OutputContentFile image = null;
 		try {
-			image = productImageService.getProductImage(storeCode, productCode, new StringBuilder().append(imageName).append(".").append(extension).toString(), size);
+			String imgName = new StringBuilder().append(imageName).append(".").append(extension).toString();
+			image = productImageService.getProductImage(storeCode, productCode, imgName, size);
 		} catch (ServiceException e) {
 			LOGGER.error("Cannot retrieve image " + imageName, e);
 		}
 		if(image!=null) {
-			return image.getFile().toByteArray();
+			byte[] outArr =  image.getFile().toByteArray();
+			return outArr;
 		} else {
-			//empty image placeholder
 			return tempImage;
 		}
 

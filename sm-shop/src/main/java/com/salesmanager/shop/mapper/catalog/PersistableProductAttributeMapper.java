@@ -52,6 +52,23 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		
 		ProductOption productOption = null;
 		
+		if(source.getOption() == null){
+			return null;
+		}
+		
+		if(source.getOption().getCode() == null){
+			return null;
+		}
+		String optionCode = source.getOptionValue().getCode();	
+		
+		if(optionCode.equals("1")){
+			return null;
+		}
+		
+		if(optionCode.equals("0")){
+			return null;
+		}
+		
 		if(!StringUtils.isBlank(source.getOption().getCode())) {
 			productOption = productOptionService.getByCode(store, source.getOption().getCode());
 		} else {
@@ -60,11 +77,14 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		}
 
 		if(productOption==null) {
-			throw new ConversionRuntimeException("Product option id " + source.getOption().getId() + " does not exist");
+			return null;
+			//throw new ConversionRuntimeException("Product option id " + source.getOption().getId() + " does not exist");
 		}
 		
 		ProductOptionValue productOptionValue = null;
-		String code = source.getOptionValue().getCode();
+		
+			
+		
 		if(!StringUtils.isBlank(source.getOptionValue().getCode())) {
 			productOptionValue = productOptionValueService.getByCode(store, source.getOptionValue().getCode());
 		} else if(source.getProductId() != null && source.getOptionValue().getId().longValue()>0) {
@@ -82,7 +102,8 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 			try {
 				productOptionValueService.saveOrUpdate(productOptionValue);
 			} catch (ServiceException e) {
-				throw new ConversionRuntimeException("Error converting ProductOptionValue",e); 
+				return null;
+				//throw new ConversionRuntimeException("Error converting ProductOptionValue",e); 
 			}
 		}
 		
@@ -100,7 +121,8 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		}**/
 		
 		if(productOption.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
-			throw new ConversionRuntimeException("Invalid product option id ");
+			return null;
+			//throw new ConversionRuntimeException("Invalid product option id ");
 		}
 		
 		if(productOptionValue!=null && productOptionValue.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
@@ -110,7 +132,8 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		if(source.getProductId() != null && source.getProductId().longValue() >0 ) {
 			Product p = productService.getById(source.getProductId());
 			if(p == null) {
-				throw new ConversionRuntimeException("Invalid product id ");
+				return null;
+				//throw new ConversionRuntimeException("Invalid product id ");
 			}
 			destination.setProduct(p);
 		}
