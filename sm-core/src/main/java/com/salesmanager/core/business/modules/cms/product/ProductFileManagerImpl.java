@@ -63,80 +63,64 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		loggerDebugM(sMethod, "start");
 		try {
 
-			// imageTestWrite();
-
 			String extension = getCalculatedExtension(contentImage);
 			String fileName = productImage.getProduct().getId() + "tmpLarge";
 
-			BufferedImage initializedBuffer = createInitializedData(productImage, contentImage);
+			BufferedImage initializedBuffer = getBufferFromInputData(productImage, contentImage);
 
 			String newFileName = fileName + "_large";
-			File largeFileCreated = createLargeFile(newFileName, extension, initializedBuffer);
-
-			boolean isExists = largeFileCreated.exists();
-			if (!isExists) {
+			File largeFileCreated = createFileFromBufferedImage(newFileName, extension, initializedBuffer);
+			if (largeFileCreated == null) {
 				loggerDebug("return-image-created-from-temp-not-exists");
-				loggerDebugM(sMethod, "return-not-exists");
 				return;
-
 			}
-
-			loggerDebugM(sMethod,
-					"img-file-exists-largeFileCreated:" + isExists + ":" + largeFileCreated.getAbsolutePath());
-
-			boolean createdFromTemp = setFromCalulatedTempFile(fileName, extension, initializedBuffer, productImage);
-
+						
+			boolean createdFromFileLG = executeAddProductImageFromFile(largeFileCreated, productImage,FileContentType.PRODUCTLG);
+			if (createdFromFileLG) {
+				loggerDebug("return-image-created-from-temp");
+			}
+			
+			boolean createdFromTemp = executeAddProductImageFromFile(largeFileCreated, productImage,FileContentType.PRODUCT);
 			if (createdFromTemp) {
 				loggerDebug("return-image-created-from-temp");
 			}
 
-			String slargeImageHeight = configuration.getProperty(PRODUCT_IMAGE_HEIGHT_SIZE);
-			String slargeImageWidth = configuration.getProperty(PRODUCT_IMAGE_WIDTH_SIZE);
-			boolean sizeConfigured = !StringUtils.isBlank(slargeImageHeight) && !StringUtils.isBlank(slargeImageWidth);
-
-			if (!sizeConfigured) {
-				contentImage.setFileContentType(FileContentType.PRODUCT);
-				uploadImage.addProductImage(productImage, contentImage);
-				loggerDebug("return-image-not-resized");
-				loggerDebugM(sMethod, "return");
+			ProductImageImportData dt = getImageData();
+			if( dt == null) {
 				return;
 			}
-
-			int largeImageHeight = Integer.parseInt(slargeImageHeight);
-			int largeImageWidth = Integer.parseInt(slargeImageWidth);
-			boolean imageSizeStatus = checkImageSize(largeImageWidth, largeImageHeight);
-
-			if (!imageSizeStatus) {
-				loggerDebug("return-image-not-resized-wrong-size");
-				loggerDebugM(sMethod, "return");
+			
+			BufferedImage providedFileBuffer = getBuferFromFile(newFileName,extension);
+			if( providedFileBuffer == null) {
+				loggerDebug("providedFileBuffer-NULL");
 				return;
 			}
-
-			BufferedImage croppedImage = getCalculatedCroppedImage(initializedBuffer, largeImageWidth,
-					largeImageHeight);
-
+			
+			BufferedImage croppedImage = getCalculatedCroppedImage(providedFileBuffer, dt.getWidth(),
+					dt.getHeight());
+			if( croppedImage == null) {
+				loggerDebug("croppedImage-NULL");
+				return;
+			}
+			
 			String croppedFileName = fileName + "_cropped";
-			File croppedFileCreated = createLargeFile(croppedFileName, extension, initializedBuffer);
-			boolean isExistsCropped = largeFileCreated.exists();
-			loggerDebugM(sMethod, "img-file-exists-croppedFileCreated:" + isExistsCropped + ":"
-					+ croppedFileCreated.getAbsolutePath());
-
-			BufferedImage largeResizedImage = getCalculatedResizedImage(croppedImage, largeImageWidth,
-					largeImageHeight);
-
+			File croppedFileCreated = createFileFromBufferedImage(croppedFileName, extension, croppedImage);
+			if (croppedFileCreated == null) {
+				loggerDebug("croppedFileCreated-NO");
+			}
+			
+			BufferedImage largeResizedImage = getCalculatedResizedImage(croppedImage, dt.getWidth(),
+					dt.getHeight());			
 			String largeResizedFileName = fileName + "_large_resized";
-			File largeResizedFileCreated = createLargeFile(largeResizedFileName, extension, initializedBuffer);
-			boolean isExistsLargeResized = largeFileCreated.exists();
-			loggerDebugM(sMethod, "img-file-exists-largeResizedFileCreated:" + isExistsLargeResized + ":"
-					+ largeResizedFileCreated.getAbsolutePath());
-
-			boolean createdFromPersisted = setFromCalulatedPersitedFile(fileName, extension, largeResizedImage,
-					productImage);
-
-			if (createdFromPersisted) {
-				loggerDebug("return-image-created-from-persisted");
-				loggerDebugM(sMethod, "return");
-				return;
+			File largeResizedFileCreated = createFileFromBufferedImage(largeResizedFileName, extension, largeResizedImage);
+			if (largeResizedFileCreated == null) {
+				loggerDebug("largeResizedFileCreated-NO");
+			}
+			
+			boolean createdFromPersisted = executeAddProductImageFromFile( largeResizedFileCreated,
+					productImage,FileContentType.PRODUCT);
+			if (!createdFromPersisted) {
+				loggerDebug("createdFromPersisted-NO");
 			}
 
 		} catch (Exception e) {
@@ -147,7 +131,34 @@ public class ProductFileManagerImpl extends ProductFileManager {
 			loggerDebugM(sMethod, "return");
 		}
 	}
+	
+	private ProductImageImportData getImageData() {
+		String sMethod = "addProductImage";
+		loggerDebugM(sMethod, "start");
+		
+		ProductImageImportData dt = new ProductImageImportData();
+		String slargeImageHeight = configuration.getProperty(PRODUCT_IMAGE_HEIGHT_SIZE);
+		String slargeImageWidth = configuration.getProperty(PRODUCT_IMAGE_WIDTH_SIZE);
+		boolean sizeConfigured = !StringUtils.isBlank(slargeImageHeight) && !StringUtils.isBlank(slargeImageWidth);
 
+		if (!sizeConfigured) {
+			return null;
+		}
+
+		int largeImageHeight = Integer.parseInt(slargeImageHeight);
+		int largeImageWidth = Integer.parseInt(slargeImageWidth);
+		boolean imageSizeStatus = checkImageSize(largeImageWidth, largeImageHeight);
+
+		if (!imageSizeStatus) {
+			loggerDebug("return-image-not-resized-wrong-size");
+			loggerDebugM(sMethod, "return");
+			return null;
+		}
+		dt.setWidth(largeImageWidth);
+		dt.setHeight(largeImageHeight);
+		return dt;
+	}
+	
 	private boolean closeInputStream(ProductImage productImage) {
 		try {
 			productImage.getImage().close();
@@ -157,8 +168,39 @@ public class ProductFileManagerImpl extends ProductFileManager {
 			return false;
 		}
 	}
+	private BufferedImage getBufferFromInputData(ProductImage productImage, ImageContentFile contentImage) {
+		String sMethod = "getBufferFromInputData";
+		loggerDebugM(sMethod, "start");
 
-	private BufferedImage createInitializedData(ProductImage productImage, ImageContentFile contentImage) {
+		try {
+			ByteArrayOutputStream baos2 = getCalculatedBufferedImage(contentImage);
+
+			if (baos2 == null) {
+				loggerDebugM(sMethod, "return");
+				return null;
+			}
+
+			InputStream is2 = new ByteArrayInputStream(baos2.toByteArray());
+			BufferedImage bufferedImage = ImageIO.read(is2);
+
+			if (bufferedImage == null) {
+				LOGGER.error("Cannot read image format for " + productImage.getProductImage());
+				loggerDebugM(sMethod, "return");
+				return null;
+			}
+
+			loggerDebugM(sMethod, "end");
+			
+			return bufferedImage;
+		} catch (Exception e) {
+			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
+			loggerDebugM(sMethod, "return");
+			return null;
+		}
+
+	}
+
+	private BufferedImage createInitializedData(ProductImage productImage, ImageContentFile contentImage,FileContentType fileContentType) {
 		String sMethod = "createInitializedData";
 		loggerDebugM(sMethod, "start");
 
@@ -179,12 +221,13 @@ public class ProductFileManagerImpl extends ProductFileManager {
 				return null;
 			}
 
-			boolean initData = setInitializedData(baos2, productImage, contentImage);
+			boolean initData = setInitializedData(baos2, productImage, contentImage,fileContentType);
 			if (!initData) {
 				loggerDebugM(sMethod, "return");
 				return null;
 			}
 			loggerDebugM(sMethod, "end");
+			
 			return bufferedImage;
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
@@ -195,11 +238,11 @@ public class ProductFileManagerImpl extends ProductFileManager {
 	}
 
 	private boolean setInitializedData(ByteArrayOutputStream baos, ProductImage productImage,
-			ImageContentFile contentImage) {
+			ImageContentFile contentImage,FileContentType fileContentType) {
 		try {
 			InputStream is1 = new ByteArrayInputStream(baos.toByteArray());
 			contentImage.setFile(is1);
-			contentImage.setFileContentType(FileContentType.PRODUCTLG);
+			contentImage.setFileContentType(fileContentType);
 			uploadImage.addProductImage(productImage, contentImage);
 
 		} catch (Exception e) {
@@ -208,38 +251,87 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		}
 		return true;
 	}
+	
+	private File createFileFromBufferedImage(String fileName, String extension, BufferedImage largeResizedImage) {
+		String sMethod = "createFileFromBufferedImage";
+		loggerDebugM(sMethod, "start");
+		
+		String createdFile = "files/images/" + fileName + "." + extension;
+		File fileLarge = new File(createdFile);
+		String absPath = fileLarge.toPath().toAbsolutePath().toString();
+
+		try {
+			ImageIO.write(largeResizedImage, extension, fileLarge);
+		} catch (Exception ex) {
+			loggerDebug("Error:" + ex.getMessage());
+		}
+
+		loggerDebug("created-image-fileLarge-absolute-path:" + absPath);
+		loggerDebug("created-image-fileLarge-abs-path-file :" + fileLarge.getAbsolutePath());
+		loggerDebug("created-image-fileLarge-exists:" + fileLarge.exists());
+		if (!fileLarge.exists()) {
+			return null;
+		}
+
+		try {
+			BufferedImage bImage = ImageIO.read(fileLarge);
+			loggerDebug("created-image-fileLarge-getHeight :" + bImage.getHeight());
+			loggerDebug("created-image-fileLarge-getWidth :" + bImage.getWidth());
+		} catch (Exception ex) {
+			loggerDebug("Error:" + ex.getMessage());
+		}
+		loggerDebugM(sMethod, "end");
+		return fileLarge;
+	}
+
+	private BufferedImage getBuferFromFile(String fileName, String extension) {
+		String sMethod = "getBuferFromFile";
+		loggerDebugM(sMethod, "start");		
+		try {
+			String createdFile = "files/images/" + fileName + "." + extension;
+			File fileLarge = new File(createdFile);			
+			BufferedImage bImage = ImageIO.read(fileLarge);
+			loggerDebug("created-image-fileLarge-getHeight :" + bImage.getHeight());
+			loggerDebug("created-image-fileLarge-getWidth :" + bImage.getWidth());
+			loggerDebugM(sMethod, "end");
+			return bImage;
+		} catch (Exception ex) {
+			loggerDebug("Error:" + ex.getMessage());
+			return null;
+		}		
+	}
+	
+	private boolean createFileAndSetData(String fileName, String extension, BufferedImage imageBuffer,
+			ProductImage productImage,FileContentType fileContentType) {
+		try {
+			File imgFile = createFileFromBufferedImage(fileName,extension,imageBuffer);
+			executeAddProductImageFromFile(imgFile, productImage,fileContentType);			
+		} catch (Exception e) {
+			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
+			return false;
+		}
+		return true;
+	}	
 
 	private boolean setFromCalulatedTempFile(String fileName, String extension, BufferedImage largeResizedImage,
-			ProductImage productImage) {
+			ProductImage productImage,FileContentType fileContentType) {
 		try {
 			File tempLarge = File.createTempFile(fileName, "." + extension);
 			ImageIO.write(largeResizedImage, extension, tempLarge);
-			setCalculatedProductImage(tempLarge, productImage);
+			executeAddProductImageFromFile(tempLarge, productImage,fileContentType);
 			tempLarge.delete();
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
 			return false;
 		}
 		return true;
-	}
+	}	
 
-	private boolean setFromCalulatedPersitedFile(String fileName, String extension, BufferedImage largeResizedImage,
-			ProductImage productImage) {
-		File fileLarge = createLargeFile(fileName, extension, largeResizedImage);
-
-		if (fileLarge == null) {
-			return false;
-		}
-
-		setCalculatedProductImage(fileLarge, productImage);
-		return true;
-	}
-
-	private boolean setCalculatedProductImage(File currentBufferedImage, ProductImage productImage) {
+	private boolean executeAddProductImageFromFile(File file, ProductImage productImage,FileContentType fileContentType) {
 		try {
-			try (FileInputStream isLarge = new FileInputStream(currentBufferedImage)) {
+			try (FileInputStream isLarge = new FileInputStream(file)) {
 				ImageContentFile largeContentImage = new ImageContentFile();
-				largeContentImage.setFileContentType(FileContentType.PRODUCT);
+				largeContentImage.setFileContentType(fileContentType);
 				largeContentImage.setFileName(productImage.getProductImage());
 				largeContentImage.setFile(isLarge);
 				uploadImage.addProductImage(productImage, largeContentImage);
@@ -315,33 +407,6 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 	}
 
-	private File createLargeFile(String fileName, String extension, BufferedImage largeResizedImage) {
-		String createdFile = "files/images/" + fileName + "." + extension;
-		File fileLarge = new File(createdFile);
-		String absPath = fileLarge.toPath().toAbsolutePath().toString();
-
-		try {
-			ImageIO.write(largeResizedImage, extension, fileLarge);
-		} catch (Exception ex) {
-			loggerDebug("Error:" + ex.getMessage());
-		}
-
-		loggerDebug("created-image-fileLarge-absolute-path:" + absPath);
-		loggerDebug("created-image-fileLarge-abs-path-file :" + fileLarge.getAbsolutePath());
-		loggerDebug("created-image-fileLarge-exists:" + fileLarge.exists());
-		if (!fileLarge.exists()) {
-			return null;
-		}
-
-		try {
-			BufferedImage bImage = ImageIO.read(fileLarge);
-			loggerDebug("created-image-fileLarge-getHeight :" + bImage.getHeight());
-			loggerDebug("created-image-fileLarge-getWidth :" + bImage.getWidth());
-		} catch (Exception ex) {
-			loggerDebug("Error:" + ex.getMessage());
-		}
-		return fileLarge;
-	}
 
 	private String getCalculatedExtension(ImageContentFile contentImage) {
 		FileNameMap fileNameMap = URLConnection.getFileNameMap();
