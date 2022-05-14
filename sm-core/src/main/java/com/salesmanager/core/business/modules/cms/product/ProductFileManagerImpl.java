@@ -62,9 +62,13 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		String sMethod = "addProductImage";
 		loggerDebugM(sMethod, "start");
 		try {
-
-			String extension = getCalculatedExtension(contentImage);
+			
 			String fileName = productImage.getProduct().getId() + "tmpLarge";
+			if(contentImage.getFileName() == null) {
+				contentImage.setFileName(fileName);
+			}
+			String extension = getCalculatedExtension(contentImage);
+			
 
 			BufferedImage initializedBuffer = getBufferFromInputData(productImage, contentImage);
 
@@ -74,68 +78,69 @@ public class ProductFileManagerImpl extends ProductFileManager {
 				loggerDebug("return-image-created-from-temp-not-exists");
 				return;
 			}
-						
-			boolean createdFromFileLG = executeAddProductImageFromFile(largeFileCreated, productImage,FileContentType.PRODUCTLG);
+
+			boolean createdFromFileLG = executeAddProductImageFromFile(largeFileCreated, productImage,
+					FileContentType.PRODUCTLG);
 			if (createdFromFileLG) {
 				loggerDebug("return-image-created-from-temp");
 			}
-			
-			boolean createdFromTemp = executeAddProductImageFromFile(largeFileCreated, productImage,FileContentType.PRODUCT);
+
+			boolean createdFromTemp = executeAddProductImageFromFile(largeFileCreated, productImage,
+					FileContentType.PRODUCT);
 			if (createdFromTemp) {
 				loggerDebug("return-image-created-from-temp");
 			}
 
 			ProductImageImportData dt = getImageData();
-			if( dt == null) {
+			if (dt == null) {
 				return;
 			}
-			
-			BufferedImage providedFileBuffer = getBuferFromFile(newFileName,extension);
-			if( providedFileBuffer == null) {
+
+			BufferedImage providedFileBuffer = getBuferFromFile(newFileName, extension);
+			if (providedFileBuffer == null) {
 				loggerDebug("providedFileBuffer-NULL");
 				return;
 			}
-			
-			BufferedImage croppedImage = getCalculatedCroppedImage(providedFileBuffer, dt.getWidth(),
-					dt.getHeight());
-			if( croppedImage == null) {
+
+			BufferedImage croppedImage = getCalculatedCroppedImage(providedFileBuffer, dt.getWidth(), dt.getHeight());
+			if (croppedImage == null) {
 				loggerDebug("croppedImage-NULL");
 				return;
 			}
-			
+
 			String croppedFileName = fileName + "_cropped";
 			File croppedFileCreated = createFileFromBufferedImage(croppedFileName, extension, croppedImage);
 			if (croppedFileCreated == null) {
 				loggerDebug("croppedFileCreated-NO");
 			}
-			
-			BufferedImage largeResizedImage = getCalculatedResizedImage(croppedImage, dt.getWidth(),
-					dt.getHeight());			
+
+			BufferedImage largeResizedImage = getCalculatedResizedImage(croppedImage, dt.getWidth(), dt.getHeight());
 			String largeResizedFileName = fileName + "_large_resized";
-			File largeResizedFileCreated = createFileFromBufferedImage(largeResizedFileName, extension, largeResizedImage);
+			File largeResizedFileCreated = createFileFromBufferedImage(largeResizedFileName, extension,
+					largeResizedImage);
 			if (largeResizedFileCreated == null) {
 				loggerDebug("largeResizedFileCreated-NO");
 			}
-			
-			boolean createdFromPersisted = executeAddProductImageFromFile( largeResizedFileCreated,
-					productImage,FileContentType.PRODUCT);
+
+			boolean createdFromPersisted = executeAddProductImageFromFile(largeResizedFileCreated, productImage,
+					FileContentType.PRODUCT);
 			if (!createdFromPersisted) {
 				loggerDebug("createdFromPersisted-NO");
 			}
 
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION:" + e.getMessage());
-			loggerDebugM(sMethod, "return-exception");
+			loggerExceptionM(sMethod, "return-exception", e);
 		} finally {
 			closeInputStream(productImage);
 			loggerDebugM(sMethod, "return");
 		}
 	}
-	
+
 	private ProductImageImportData getImageData() {
 		String sMethod = "addProductImage";
 		loggerDebugM(sMethod, "start");
-		
+
 		ProductImageImportData dt = new ProductImageImportData();
 		String slargeImageHeight = configuration.getProperty(PRODUCT_IMAGE_HEIGHT_SIZE);
 		String slargeImageWidth = configuration.getProperty(PRODUCT_IMAGE_WIDTH_SIZE);
@@ -158,7 +163,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		dt.setHeight(largeImageHeight);
 		return dt;
 	}
-	
+
 	private boolean closeInputStream(ProductImage productImage) {
 		try {
 			productImage.getImage().close();
@@ -168,6 +173,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 			return false;
 		}
 	}
+
 	private BufferedImage getBufferFromInputData(ProductImage productImage, ImageContentFile contentImage) {
 		String sMethod = "getBufferFromInputData";
 		loggerDebugM(sMethod, "start");
@@ -190,7 +196,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 			}
 
 			loggerDebugM(sMethod, "end");
-			
+
 			return bufferedImage;
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
@@ -200,7 +206,8 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 	}
 
-	private BufferedImage createInitializedData(ProductImage productImage, ImageContentFile contentImage,FileContentType fileContentType) {
+	private BufferedImage createInitializedData(ProductImage productImage, ImageContentFile contentImage,
+			FileContentType fileContentType) {
 		String sMethod = "createInitializedData";
 		loggerDebugM(sMethod, "start");
 
@@ -221,13 +228,13 @@ public class ProductFileManagerImpl extends ProductFileManager {
 				return null;
 			}
 
-			boolean initData = setInitializedData(baos2, productImage, contentImage,fileContentType);
+			boolean initData = setInitializedData(baos2, productImage, contentImage, fileContentType);
 			if (!initData) {
 				loggerDebugM(sMethod, "return");
 				return null;
 			}
 			loggerDebugM(sMethod, "end");
-			
+
 			return bufferedImage;
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
@@ -238,7 +245,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 	}
 
 	private boolean setInitializedData(ByteArrayOutputStream baos, ProductImage productImage,
-			ImageContentFile contentImage,FileContentType fileContentType) {
+			ImageContentFile contentImage, FileContentType fileContentType) {
 		try {
 			InputStream is1 = new ByteArrayInputStream(baos.toByteArray());
 			contentImage.setFile(is1);
@@ -251,11 +258,11 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		}
 		return true;
 	}
-	
+
 	private File createFileFromBufferedImage(String fileName, String extension, BufferedImage largeResizedImage) {
 		String sMethod = "createFileFromBufferedImage";
 		loggerDebugM(sMethod, "start");
-		
+
 		String createdFile = "files/images/" + fileName + "." + extension;
 		File fileLarge = new File(createdFile);
 		String absPath = fileLarge.toPath().toAbsolutePath().toString();
@@ -286,10 +293,10 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 	private BufferedImage getBuferFromFile(String fileName, String extension) {
 		String sMethod = "getBuferFromFile";
-		loggerDebugM(sMethod, "start");		
+		loggerDebugM(sMethod, "start");
 		try {
 			String createdFile = "files/images/" + fileName + "." + extension;
-			File fileLarge = new File(createdFile);			
+			File fileLarge = new File(createdFile);
 			BufferedImage bImage = ImageIO.read(fileLarge);
 			loggerDebug("created-image-fileLarge-getHeight :" + bImage.getHeight());
 			loggerDebug("created-image-fileLarge-getWidth :" + bImage.getWidth());
@@ -298,43 +305,53 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		} catch (Exception ex) {
 			loggerDebug("Error:" + ex.getMessage());
 			return null;
-		}		
+		}
 	}
-	
+
 	private boolean createFileAndSetData(String fileName, String extension, BufferedImage imageBuffer,
-			ProductImage productImage,FileContentType fileContentType) {
+			ProductImage productImage, FileContentType fileContentType) {
 		try {
-			File imgFile = createFileFromBufferedImage(fileName,extension,imageBuffer);
-			executeAddProductImageFromFile(imgFile, productImage,fileContentType);			
+			File imgFile = createFileFromBufferedImage(fileName, extension, imageBuffer);
+			executeAddProductImageFromFile(imgFile, productImage, fileContentType);
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
 			return false;
 		}
 		return true;
-	}	
+	}
 
 	private boolean setFromCalulatedTempFile(String fileName, String extension, BufferedImage largeResizedImage,
-			ProductImage productImage,FileContentType fileContentType) {
+			ProductImage productImage, FileContentType fileContentType) {
 		try {
 			File tempLarge = File.createTempFile(fileName, "." + extension);
 			ImageIO.write(largeResizedImage, extension, tempLarge);
-			executeAddProductImageFromFile(tempLarge, productImage,fileContentType);
+			executeAddProductImageFromFile(tempLarge, productImage, fileContentType);
 			tempLarge.delete();
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
 			return false;
 		}
 		return true;
-	}	
+	}
 
-	private boolean executeAddProductImageFromFile(File file, ProductImage productImage,FileContentType fileContentType) {
+	private boolean executeAddProductImageFromFile(File file, ProductImage productImage,
+			FileContentType fileContentType) {
+		String sMethod = "executeAddProductImageFromFile";
+		loggerDebugM(sMethod, "start");
+		
 		try {
 			try (FileInputStream isLarge = new FileInputStream(file)) {
 				ImageContentFile largeContentImage = new ImageContentFile();
+				loggerDebugM(sMethod, "fileContentType:" + fileContentType);
 				largeContentImage.setFileContentType(fileContentType);
-				largeContentImage.setFileName(productImage.getProductImage());
+				String sKeyFile = productImage.getProduct().getId().toString();
+				loggerDebugM(sMethod, "key:" + sKeyFile);
+				String sKey = productImage.getProductImage();
+				loggerDebugM(sMethod, "key:" + sKey);
+				largeContentImage.setFileName(sKey);
 				largeContentImage.setFile(isLarge);
 				uploadImage.addProductImage(productImage, largeContentImage);
+				loggerDebugM(sMethod, "end");
 				return true;
 			}
 		} catch (Exception e) {
@@ -407,22 +424,32 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 	}
 
-
 	private String getCalculatedExtension(ImageContentFile contentImage) {
+		String sMethod = "getCalculatedExtension";
+		loggerDebugM(sMethod, "start");
 		FileNameMap fileNameMap = URLConnection.getFileNameMap();
+		try {
+			String fn = contentImage.getFileName();
+			if(fn  == null) {
+				return "png";
+			}
+			loggerDebugM(sMethod, "filename:" + fn);
+			String contentType = fileNameMap.getContentTypeFor(fn);
+			String extension = null;
+			if (contentType != null) {
+				extension = contentType.substring(contentType.indexOf('/') + 1, contentType.length());
+			}
 
-		String contentType = fileNameMap.getContentTypeFor(contentImage.getFileName());
-		String extension = null;
-		if (contentType != null) {
-			extension = contentType.substring(contentType.indexOf('/') + 1, contentType.length());
+			if (extension == null) {
+				// extension = "jpeg";
+				extension = "png";
+			}
+			extension = "png";
+			return extension;
+		} catch (Exception e) {
+			loggerExceptionM(sMethod,"Exception occured :" ,e);
+			return "png";
 		}
-
-		if (extension == null) {
-			// extension = "jpeg";
-			extension = "jpg";
-		}
-		extension = "png";
-		return extension;
 
 	}
 
