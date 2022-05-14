@@ -60,17 +60,35 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 	public void addProductImage(ProductImage productImage, ImageContentFile contentImage) throws ServiceException {
 		String sMethod = "addProductImage";
-		loggerDebugM(sMethod , "start");
+		loggerDebugM(sMethod, "start");
 		try {
 
-			imageTestWrite();
+			// imageTestWrite();
 
 			String extension = getCalculatedExtension(contentImage);
 			String fileName = productImage.getProduct().getId() + "tmpLarge";
+
 			BufferedImage initializedBuffer = createInitializedData(productImage, contentImage);
-			
-			String newFileName = fileName + "_p";
+
+			String newFileName = fileName + "_large";
 			File largeFileCreated = createLargeFile(newFileName, extension, initializedBuffer);
+
+			boolean isExists = largeFileCreated.exists();
+			if (!isExists) {
+				loggerDebug("return-image-created-from-temp-not-exists");
+				loggerDebugM(sMethod, "return-not-exists");
+				return;
+
+			}
+
+			loggerDebugM(sMethod,
+					"img-file-exists-largeFileCreated:" + isExists + ":" + largeFileCreated.getAbsolutePath());
+
+			boolean createdFromTemp = setFromCalulatedTempFile(fileName, extension, initializedBuffer, productImage);
+
+			if (createdFromTemp) {
+				loggerDebug("return-image-created-from-temp");
+			}
 
 			String slargeImageHeight = configuration.getProperty(PRODUCT_IMAGE_HEIGHT_SIZE);
 			String slargeImageWidth = configuration.getProperty(PRODUCT_IMAGE_WIDTH_SIZE);
@@ -80,7 +98,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 				contentImage.setFileContentType(FileContentType.PRODUCT);
 				uploadImage.addProductImage(productImage, contentImage);
 				loggerDebug("return-image-not-resized");
-				loggerDebugM(sMethod , "return");
+				loggerDebugM(sMethod, "return");
 				return;
 			}
 
@@ -90,39 +108,43 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 			if (!imageSizeStatus) {
 				loggerDebug("return-image-not-resized-wrong-size");
-				loggerDebugM(sMethod , "return");
+				loggerDebugM(sMethod, "return");
 				return;
 			}
 
 			BufferedImage croppedImage = getCalculatedCroppedImage(initializedBuffer, largeImageWidth,
 					largeImageHeight);
 
+			String croppedFileName = fileName + "_cropped";
+			File croppedFileCreated = createLargeFile(croppedFileName, extension, initializedBuffer);
+			boolean isExistsCropped = largeFileCreated.exists();
+			loggerDebugM(sMethod, "img-file-exists-croppedFileCreated:" + isExistsCropped + ":"
+					+ croppedFileCreated.getAbsolutePath());
+
 			BufferedImage largeResizedImage = getCalculatedResizedImage(croppedImage, largeImageWidth,
 					largeImageHeight);
+
+			String largeResizedFileName = fileName + "_large_resized";
+			File largeResizedFileCreated = createLargeFile(largeResizedFileName, extension, initializedBuffer);
+			boolean isExistsLargeResized = largeFileCreated.exists();
+			loggerDebugM(sMethod, "img-file-exists-largeResizedFileCreated:" + isExistsLargeResized + ":"
+					+ largeResizedFileCreated.getAbsolutePath());
 
 			boolean createdFromPersisted = setFromCalulatedPersitedFile(fileName, extension, largeResizedImage,
 					productImage);
 
 			if (createdFromPersisted) {
 				loggerDebug("return-image-created-from-persisted");
-				loggerDebugM(sMethod , "return");
-				return;
-			}
-
-			boolean createdFromTemp = setFromCalulatedTempFile(fileName, extension, largeResizedImage, productImage);
-
-			if (createdFromTemp) {
-				loggerDebug("return-image-created-from-temp");
-				loggerDebugM(sMethod , "return");
+				loggerDebugM(sMethod, "return");
 				return;
 			}
 
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION:" + e.getMessage());
-			loggerDebugM(sMethod , "return-exception");
+			loggerDebugM(sMethod, "return-exception");
 		} finally {
 			closeInputStream(productImage);
-			loggerDebugM(sMethod , "return");
+			loggerDebugM(sMethod, "return");
 		}
 	}
 
@@ -135,17 +157,16 @@ public class ProductFileManagerImpl extends ProductFileManager {
 			return false;
 		}
 	}
-	
-	
+
 	private BufferedImage createInitializedData(ProductImage productImage, ImageContentFile contentImage) {
 		String sMethod = "createInitializedData";
-		loggerDebugM(sMethod , "start");
-		
+		loggerDebugM(sMethod, "start");
+
 		try {
 			ByteArrayOutputStream baos2 = getCalculatedBufferedImage(contentImage);
 
 			if (baos2 == null) {
-				loggerDebugM(sMethod , "return");
+				loggerDebugM(sMethod, "return");
 				return null;
 			}
 
@@ -154,20 +175,20 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 			if (bufferedImage == null) {
 				LOGGER.error("Cannot read image format for " + productImage.getProductImage());
-				loggerDebugM(sMethod , "return");
+				loggerDebugM(sMethod, "return");
 				return null;
 			}
 
 			boolean initData = setInitializedData(baos2, productImage, contentImage);
 			if (!initData) {
-				loggerDebugM(sMethod , "return");
+				loggerDebugM(sMethod, "return");
 				return null;
 			}
-			loggerDebugM(sMethod , "end");
+			loggerDebugM(sMethod, "end");
 			return bufferedImage;
 		} catch (Exception e) {
 			LOGGER.error("EXCEPTION-ADD-PRODUCT-IMAGE:" + e.getMessage());
-			loggerDebugM(sMethod , "return");
+			loggerDebugM(sMethod, "return");
 			return null;
 		}
 
@@ -313,11 +334,9 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		}
 
 		try {
-
 			BufferedImage bImage = ImageIO.read(fileLarge);
 			loggerDebug("created-image-fileLarge-getHeight :" + bImage.getHeight());
 			loggerDebug("created-image-fileLarge-getWidth :" + bImage.getWidth());
-
 		} catch (Exception ex) {
 			loggerDebug("Error:" + ex.getMessage());
 		}
@@ -337,6 +356,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 			// extension = "jpeg";
 			extension = "jpg";
 		}
+		extension = "png";
 		return extension;
 
 	}
@@ -380,15 +400,15 @@ public class ProductFileManagerImpl extends ProductFileManager {
 		String stx = getDbgClassName() + ttx;
 		LOGGER.debug(stx);
 	}
-	
+
 	private void loggerDebugM(String sMethod, String ttx) {
-		String stx = getDbgClassName()+ ":" + sMethod + ":" + ttx;
+		String stx = getDbgClassName() + ":" + sMethod + ":" + ttx;
 		LOGGER.debug(stx);
 	}
-	
-	private void loggerExceptionM(String sMethod, String ttx,Exception ex) {
-		String stx = getDbgClassName()+ ":" + sMethod + ":" + ttx;
-		
+
+	private void loggerExceptionM(String sMethod, String ttx, Exception ex) {
+		String stx = getDbgClassName() + ":" + sMethod + ":" + ttx;
+
 		LOGGER.debug(stx + "exc-start");
 		LOGGER.error(ex.getMessage());
 		LOGGER.debug(stx + "exc-end");
