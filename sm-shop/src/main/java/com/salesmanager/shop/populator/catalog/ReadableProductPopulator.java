@@ -243,9 +243,16 @@ public class ReadableProductPopulator extends
 				imageList = imageList.stream()
 				.sorted(Comparator.comparingInt(ReadableImage::getOrder))
 				.collect(Collectors.toList());
-				
+
 				target
 				.setImages(imageList);
+				
+				if (target.getImage() == null) {
+					if (target.getImages() != null && target.getImages().size() > 0) {
+						target.setImage(target.getImages().get(0));
+					}
+				}
+				
 			}
 
 			if(!CollectionUtils.isEmpty(source.getCategories())) {
