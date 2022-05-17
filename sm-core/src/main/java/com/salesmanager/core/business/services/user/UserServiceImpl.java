@@ -126,6 +126,11 @@ public class UserServiceImpl extends SalesManagerEntityServiceImpl<Long, User> i
 	}
 
 	@Override
+	public User getUserById(Long id) {		
+		return userRepository.findUserByUserId(id);
+	}
+	
+	@Override
 	public User findByResetPasswordToken(String userName, String token, MerchantStore store) throws ServiceException {
 		Validate.notNull(userName, "User name cannot be null");
 		Validate.notNull(token, "Token cannot be null");

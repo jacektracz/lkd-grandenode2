@@ -23,6 +23,9 @@ public interface UserService extends SalesManagerEntityService<Long, User> {
   
   User getById(Long id, MerchantStore store);
   
+  User getUserById(Long id);
+  
+  
   User getByPasswordResetToken(String storeCode, String token);
 
   /**

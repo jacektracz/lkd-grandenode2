@@ -719,7 +719,11 @@ public class UserFacadeImpl implements UserFacade {
 
 		User user = userService.getById(id, store);
 		if (user == null) {
-			throw new ResourceNotFoundException("User [" + id + "] not found");
+			user = userService.getUserById(id);			
+		}
+		if (user == null) {
+			
+			throw new ResourceNotFoundException("User [" + id + "] [getCode:" + store.getCode() +  "] not found");
 		}
 
 		return convertUserToReadableUser(lang, user);
