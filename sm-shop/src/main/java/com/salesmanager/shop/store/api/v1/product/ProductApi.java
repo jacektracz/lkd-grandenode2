@@ -204,6 +204,9 @@ public class ProductApi {
 			// page
 			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
+		
+		String sMethod = "list";
+		loggerDebugM(sMethod, "start");
 
 		ProductCriteria criteria = new ProductCriteria();
 		
@@ -539,4 +542,25 @@ public class ProductApi {
 		return def;
 
 	}
+	
+	private String getDbgClassName() {
+		return "ProductRequestEntityProducer::";
+	}
+	
+	private void loggerDebug(String ttx) {
+		String stx = getDbgClassName() + ttx;
+		LOGGER.debug(stx);
+	}
+
+	private void loggerDebugM(String sMethod, String ttx) {
+		String stx = getDbgClassName() + ":" + sMethod + ":" + ttx;
+		LOGGER.debug(stx);
+	}
+
+	private void loggerExceptionM(String sMethod, String ttx, Exception ex) {
+		String stx = getDbgClassName() + ":" + sMethod + ":" + ttx;
+		LOGGER.debug(stx);
+		LOGGER.error(ex.getMessage());
+	}	
+	
 }
